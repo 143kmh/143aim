@@ -22,7 +22,7 @@ export default function StrafeMode({ dict }: { dict: any }) {
     offTargetTimeoutId: 0 as any,
     startTime: 0,
     isHovered: false,
-    vx: 9,                 
+    vx: 7, // Снижена базовая скорость для стабильного трекинга
     x: 0,                  
     hasDriftedOff: false,  
     trackedTime: 0,        
@@ -69,6 +69,12 @@ export default function StrafeMode({ dict }: { dict: any }) {
         const s = engineState.current;
         s.isHovered = true;
         
+        // КРИТИЧЕСКИЙ ФИКС: Обязательно снимаем таймер наказания, если курсор вернулся
+        if (s.offTargetTimeoutId) {
+          clearTimeout(s.offTargetTimeoutId);
+          s.offTargetTimeoutId = 0;
+        }
+        
         if (s.status === 'waiting') {
           changeStatus('tracking');
           s.trackedTime = 0; 
@@ -88,11 +94,14 @@ export default function StrafeMode({ dict }: { dict: any }) {
         }
 
         if (s.status === 'tracking' || s.status === 'reaction_phase') {
+          // КРИТИЧЕСКИЙ ФИКС: Сбрасываем старый таймер перед запуском нового, чтобы избежать наслоения
+          if (s.offTargetTimeoutId) clearTimeout(s.offTargetTimeoutId);
+          
           s.offTargetTimeoutId = setTimeout(() => {
             if (!s.isHovered && (engineState.current.status === 'tracking' || engineState.current.status === 'reaction_phase')) {
               handleFail("TRACKING FAILED! STRAYED FROM TARGET.");
             }
-          }, 400);
+          }, 800); // Увеличен буфер до 800мс для реалистичного окна доводки
         }
       });
 
@@ -146,13 +155,13 @@ export default function StrafeMode({ dict }: { dict: any }) {
 
   const handleStart = () => {
     if (useReactionStore.getState().results.length >= 10) return;
-    // ИСПРАВЛЕНИЕ: сбрасываем ошибку при старте новой попытки
+    
     setErrorMsg(null);
     setLastTime(null);
     
     const s = engineState.current;
     s.x = appRef.current ? appRef.current.screen.width / 2 : 200;
-    s.vx = Math.random() > 0.5 ? 9 : -9; 
+    s.vx = Math.random() > 0.5 ? 7 : -7; 
     s.trackedTime = 0;
     s.isHovered = false;
     s.hasDriftedOff = false;
@@ -170,7 +179,7 @@ export default function StrafeMode({ dict }: { dict: any }) {
     const s = engineState.current;
     s.status = 'reaction_phase';
     setUiStatus('reaction_phase');
-    s.vx = -s.vx * 1.1; 
+    s.vx = -s.vx * 1.05; // Снижен резкий рывок скорости
     s.startTime = performance.now(); 
     s.hasDriftedOff = !s.isHovered; 
   };
@@ -217,7 +226,6 @@ export default function StrafeMode({ dict }: { dict: any }) {
       
       <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-6 text-center z-10">
         {isFinished ? (
-          // Экран результатов
           <div className="bg-[#0b0812]/95 backdrop-blur-2xl border border-imperial/50 p-10 rounded-3xl flex flex-col items-center gap-4 shadow-[0_0_50px_rgba(96,81,155,0.4)] animate-in zoom-in-95 duration-500 pointer-events-auto min-w-[320px]">
             {isNewPb && <div className="text-yellow-400 text-xs font-black tracking-widest uppercase flex items-center gap-2 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] animate-pulse"><Trophy size={14}/> NEW PERSONAL BEST!</div>}
             <h2 className="text-sm font-bold text-lavender tracking-[0.2em] uppercase">Strafe Test Complete</h2>
@@ -225,7 +233,6 @@ export default function StrafeMode({ dict }: { dict: any }) {
             <button onClick={() => { state.resetResults(); setLastTime(null); setIsNewPb(false); changeStatus('idle'); }} className="mt-4 w-full py-4 bg-imperial/20 hover:bg-imperial/40 border border-imperial/50 rounded-xl text-sm font-bold text-ivory tracking-widest uppercase transition-all flex items-center justify-center gap-3 shadow-[0_0_15px_rgba(96,81,155,0.3)] cursor-pointer pointer-events-auto"><RotateCcw size={18} /> PLAY AGAIN</button>
           </div>
         ) : errorMsg ? (
-          // ИСПРАВЛЕНИЕ: ошибка — отдельное состояние, не перекрывается кнопкой
           <div className="flex flex-col items-center gap-4 pointer-events-auto">
             <p className="text-sm font-bold text-red-400 bg-red-950/50 px-4 py-2 rounded-lg border border-red-500/30 flex items-center gap-2">
               <AlertTriangle size={16} /> {errorMsg}
@@ -238,7 +245,6 @@ export default function StrafeMode({ dict }: { dict: any }) {
             </button>
           </div>
         ) : uiStatus === 'idle' ? (
-          // Чистый старт
           <div className="flex flex-col items-center gap-4 pointer-events-auto">
             {lastTime !== null && (
               <p className="text-2xl font-bold text-lavender/80 tracking-wider">React: {lastTime} ms</p>
@@ -251,7 +257,6 @@ export default function StrafeMode({ dict }: { dict: any }) {
             </button>
           </div>
         ) : (
-          // Активная игра — подсказки
           <div className="absolute top-8 left-0 right-0 flex justify-center">
             {uiStatus === 'waiting' && (
               <span className="text-xs font-black tracking-[0.3em] uppercase text-purple-400 animate-pulse bg-purple-950/40 px-4 py-2 border border-purple-500/20 rounded">

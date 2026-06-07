@@ -68,17 +68,19 @@ export default function Header({ dict, lang }: { dict: any, lang: string }) {
       <header className="sticky top-0 z-[100] w-full border-b border-white/5 bg-[#05020a]/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
         <div className="max-w-[1920px] mx-auto px-6 h-16 flex items-center justify-between">
           
-          {/* ЛОГО: иконка сердца + шрифт Orbitron */}
+          {/* ЛОГО: Глассморфизм + dusty imperial */}
           <Link href={`/${lang}`} className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#7c3aed] to-[#4c1d95] rounded-lg flex items-center justify-center border border-purple-500/50 group-hover:shadow-[0_0_18px_rgba(124,58,237,0.7)] transition-all">
-              {/* Сердце SVG фиолетовое */}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-white">
-                <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
+            <div className="w-8 h-8 bg-imperial/20 backdrop-blur-md rounded-lg flex items-center justify-center border border-imperial/40 group-hover:border-imperial group-hover:bg-imperial/40 group-hover:shadow-[0_0_15px_rgba(96,81,155,0.5)] transition-all duration-300">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-ivory group-hover:scale-110 transition-transform duration-300">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v4" />
+                <path d="M12 18v4" />
+                <path d="M2 12h4" />
+                <path d="M18 12h4" />
               </svg>
             </div>
-            {/* Современный шрифт через Google Fonts inline */}
             <span 
-              className="font-black text-ivory text-sm hidden sm:block tracking-widest"
+              className="font-black text-ivory text-sm hidden sm:block tracking-widest group-hover:text-imperial transition-colors duration-300"
               style={{ fontFamily: "'Orbitron', 'Rajdhani', 'Inter', sans-serif", letterSpacing: '0.15em' }}
             >
               143 AIM CLUB
@@ -101,7 +103,7 @@ export default function Header({ dict, lang }: { dict: any, lang: string }) {
           </nav>
 
           <div className="flex items-center gap-4">
-            <Link href={newPath} className="text-xs font-black text-lavender/50 hover:text-ivory hover:drop-shadow-[0_0_8px_#A985FF] transition-all uppercase tracking-widest">
+            <Link href={newPath} className="text-xs font-black text-lavender/50 hover:text-ivory hover:drop-shadow-[0_0_8px_rgba(194,187,224,0.5)] transition-all uppercase tracking-widest">
               {toggleLang}
             </Link>
             <div className="w-[1px] h-6 bg-white/10" />
