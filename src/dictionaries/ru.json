@@ -1,0 +1,56 @@
+{
+  "header": {
+    "converter": "Конвертер",
+    "reaction": "Тестер реакции",
+    "benchmarks": "Бенчмарки",
+    "tournaments": "Турниры",
+    "routines": "Рутины",
+    "login_steam": "Войти через Steam",
+    "profile": "Профиль",
+    "logout": "Выйти"
+  },
+  "home": {
+    "title": "ДОБРО ПОЖАЛОВАТЬ В 143",
+    "subtitle": "Выберите модуль для начала работы",
+    "mod_converter_title": "Sens Converter",
+    "mod_converter_desc": "Моментальная конвертация чувствительности между 15+ играми",
+    "mod_reaction_title": "Reaction Tester",
+    "mod_reaction_desc": "Когнитивные тесты и симулятор скорости реакции на базе WebGL",
+    "coming_soon": "Скоро"
+  },
+  "converter": {
+    "title": "Sens Converter",
+    "desc": "Сверхточная конвертация чувствительности мыши",
+    "tab_cm": "CM/360 в Игру",
+    "tab_g2g": "Из Игры в Игру",
+    "sub_cm2game": "CM В ИГРУ",
+    "sub_game2cm": "ИГРА В CM",
+    "game": "Игра:",
+    "from_game": "Из игры:",
+    "to_game": "В игру:",
+    "sens": "Чувствительность:",
+    "dpi": "DPI мыши:",
+    "target_cm": "Целевая дистанция CM/360:",
+    "result": "РЕЗУЛЬТАТ:",
+    "distance": "ДИСТАНЦИЯ НА КОВРИКЕ:",
+    "config": "ДЛЯ ФАЙЛА КОНФИГА",
+    "feels_like": "ОЩУЩАЕТСЯ КАК"
+  },
+  "reaction": {
+    "title": "Reaction Tester",
+    "desc": "Hardware-accelerated симулятор когнитивных тестов",
+    "mode_simple": "Simple",
+    "mode_choice": "Choice",
+    "mode_flick": "Flick",
+    "mode_combined": "Combined",
+    "mode_strafe": "Strafe React",
+    "click_to_start": "КЛИКНИТЕ ДЛЯ СТАРТА",
+    "wait": "ЖДИТЕ ЗЕЛЕНЫЙ...",
+    "click_now": "КЛИК!",
+    "too_soon": "СЛИШКОМ РАНО! КЛИКНИТЕ ЧТОБЫ ПРОДОЛЖИТЬ",
+    "avg": "Среднее:",
+    "ms": "мс",
+    "save": "Сохранить рекорд",
+    "attempts": "Попытки:"
+  }
+}

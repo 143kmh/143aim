@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-night: #09090F;
+  --color-imperial: #60519b;
+  --color-lavender: #c2bbe0;
+  --color-ivory: #f0ebe0;
+  --color-blood: #722f37;
+  --color-gold: #c4a44a;
+  
+  --background-image-glass-gradient: linear-gradient(to bottom right, rgba(96, 81, 155, 0.25), transparent, transparent);
+  --shadow-glass-glow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(96, 81, 155, 0.08);
+}
+
+body {
+  background-color: var(--color-night);
+  color: var(--color-ivory);
+  overflow-x: hidden;
+  /* Для Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 81, 155, 0.3) var(--color-night);
+}
+
+/* Кастомный скроллбар в стиле стеклянного дизайна (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-night);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(96, 81, 155, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 81, 155, 0.6);
+}
+
+/* Утилита для скрытия скроллбара, но сохранения прокрутки (нужна для некоторых виджетов) */
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// МОДУЛЬ 0: Пользователи и авторизация
+// ==========================================
+model User {
+  id            String   @id @default(uuid())
+  steamId       String   @unique
+  username      String   
+  
+  customName    String?  @unique
+  hasCustomName Boolean  @default(false)
+  
+  avatarUrl     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Привязка ID других игровых аккаунтов
+  discordId     String?  @unique
+  
+  // Riot Games (Полностью защищенная связь по PUUID)
+  riotId        String?  // Никнейм в Valorant (gameName#tagLine)
+  riotPuuid     String?  @unique // Уникальный и неизменяемый ID игрока
+  
+  faceitId      String?  
+  owId          String?  
+  marvelId      String?  
+
+  riotRank      String?  
+  faceitRank    String?  
+  owRank        String?  
+  marvelRank    String?  
+
+  // Faceit Stats (кэшируем за 43 игры)
+  faceitElo     Int?
+  faceitKd      Float?   
+  faceitWinrate Int?     
+  faceitHs      Int?     
+
+  // Valorant Stats (кэшируем за 10 игр)
+  riotElo       Int?     // Настоящие 0-100 RR внутри ранга
+  riotImage     String?  
+  riotKd        Float?   
+  riotWinrate   Int?     
+  riotHs        Int?     
+
+  // Временные токены для верификации (хранятся на сервере, не у клиента)
+  owVerifyToken    String?  // Аватар OW на момент начала верификации
+  riotVerifyToken  String?  // Card ID Valorant на момент начала верификации
+  
+  // Кэш: время последнего синка внешних API
+  lastSyncedAt  DateTime?
+
+  cheatAttempts  CheatAttempt[]
+  reactionScores ReactionScore[]
+  sessions       Session[]        // <-- новая связь
+}
+
+// ==========================================
+// МОДУЛЬ 1: Сессии (ИСПРАВЛЕНИЕ КРИТИЧЕСКОЙ УЯЗВИМОСТИ)
+// Раньше в куки хранился user.id — теперь отдельный случайный токен
+// ==========================================
+model Session {
+  id        String   @id @default(uuid()) // Это и есть токен сессии — случайный UUID
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime // Явное время жизни сессии
+}
+
+model CheatAttempt {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  ipAddress String
+  userAgent String
+  module    String
+  timestamp DateTime @default(now())
+}
+
+// ==========================================
+// МОДУЛЬ 2: Тестер Реакции
+// ==========================================
+model ReactionScore {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  mode      String   
+  bestMs    Int      
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, mode])
+}

@@ -1,0 +1,56 @@
+{
+  "header": {
+    "converter": "Converter",
+    "reaction": "Reaction Tester",
+    "benchmarks": "Benchmarks",
+    "tournaments": "Tournaments",
+    "routines": "Routines",
+    "login_steam": "Login via Steam",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "WELCOME TO 143",
+    "subtitle": "Select a module to begin",
+    "mod_converter_title": "Sens Converter",
+    "mod_converter_desc": "Instant sensitivity conversion between 15+ games",
+    "mod_reaction_title": "Reaction Tester",
+    "mod_reaction_desc": "Cognitive tests and reaction speed simulator built on WebGL",
+    "coming_soon": "Coming Soon"
+  },
+  "converter": {
+    "title": "Sens Converter",
+    "desc": "Ultra-precise mouse sensitivity conversion",
+    "tab_cm": "CM/360 TO GAME",
+    "tab_g2g": "GAME TO GAME",
+    "sub_cm2game": "CM TO GAME",
+    "sub_game2cm": "GAME TO CM",
+    "game": "Game:",
+    "from_game": "From game:",
+    "to_game": "To game:",
+    "sens": "Sensitivity:",
+    "dpi": "Mouse DPI:",
+    "target_cm": "Target CM/360 Distance:",
+    "result": "RESULT:",
+    "distance": "DISTANCE ON MOUSEPAD:",
+    "config": "FOR CONFIG FILE",
+    "feels_like": "FEELS LIKE"
+  },
+  "reaction": {
+    "title": "Reaction Tester",
+    "desc": "Hardware-accelerated cognitive test simulator",
+    "mode_simple": "Simple",
+    "mode_choice": "Choice",
+    "mode_flick": "Flick",
+    "mode_combined": "Combined",
+    "mode_strafe": "Strafe React",
+    "click_to_start": "CLICK TO START",
+    "wait": "WAIT FOR GREEN...",
+    "click_now": "CLICK!",
+    "too_soon": "TOO SOON! CLICK TO CONTINUE",
+    "avg": "Average:",
+    "ms": "ms",
+    "save": "Save Record",
+    "attempts": "Attempts:"
+  }
+}
