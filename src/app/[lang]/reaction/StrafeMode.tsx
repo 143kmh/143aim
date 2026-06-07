@@ -17,7 +17,7 @@ export default function StrafeMode({ dict }: { dict: any }) {
   const targetRef = useRef<PIXI.Graphics | null>(null);
 
   const engineState = useRef({ 
-    status: 'idle', // 'idle', 'waiting', 'tracking', 'reaction_phase'
+    status: 'idle',
     timeoutId: 0 as any, 
     offTargetTimeoutId: 0 as any,
     startTime: 0,
@@ -53,21 +53,18 @@ export default function StrafeMode({ dict }: { dict: any }) {
       canvasContainerRef.current.appendChild(app.canvas);
       appRef.current = app;
 
-      // Слой фона
       const bg = new PIXI.Sprite(PIXI.Texture.WHITE);
       bg.width = app.screen.width; bg.height = app.screen.height; bg.tint = COLORS.NIGHT;
       bg.eventMode = 'static';
       bg.cursor = 'crosshair';
       app.stage.addChild(bg);
 
-      // Сфера стрейфа
       const target = new PIXI.Graphics();
       target.circle(0, 0, 30).fill(COLORS.TARGET);
       target.eventMode = 'static';
       target.cursor = 'crosshair';
       target.visible = false;
 
-      // Отслеживание наведения прицела
       target.on('pointerover', () => {
         const s = engineState.current;
         s.isHovered = true;
@@ -90,20 +87,18 @@ export default function StrafeMode({ dict }: { dict: any }) {
           s.hasDriftedOff = true;
         }
 
-        // КРИТИЧЕСКИЙ ФИКС: Сброс попытки, если прицел слетел более чем на 400 мс (наказание)
         if (s.status === 'tracking' || s.status === 'reaction_phase') {
           s.offTargetTimeoutId = setTimeout(() => {
             if (!s.isHovered && (engineState.current.status === 'tracking' || engineState.current.status === 'reaction_phase')) {
               handleFail("TRACKING FAILED! STRAYED FROM TARGET.");
             }
-          }, 400); // 400 мс буфера
+          }, 400);
         }
       });
 
       app.stage.addChild(target);
       targetRef.current = target;
 
-      // ТИКЕР ДВИЖЕНИЯ
       app.ticker.add((ticker) => {
         const s = engineState.current;
         if ((s.status === 'tracking' || s.status === 'reaction_phase') && targetRef.current) {
@@ -117,7 +112,6 @@ export default function StrafeMode({ dict }: { dict: any }) {
           targetRef.current.x = s.x;
           targetRef.current.y = app.screen.height / 2;
 
-          // Накопление времени удержания
           if (s.status === 'tracking' && s.isHovered) {
             s.trackedTime += ticker.elapsedMS;
             
@@ -152,7 +146,9 @@ export default function StrafeMode({ dict }: { dict: any }) {
 
   const handleStart = () => {
     if (useReactionStore.getState().results.length >= 10) return;
+    // ИСПРАВЛЕНИЕ: сбрасываем ошибку при старте новой попытки
     setErrorMsg(null);
+    setLastTime(null);
     
     const s = engineState.current;
     s.x = appRef.current ? appRef.current.screen.width / 2 : 200;
@@ -219,43 +215,55 @@ export default function StrafeMode({ dict }: { dict: any }) {
     <div className="relative flex-1 rounded-2xl overflow-hidden border border-imperial/40 shadow-glass-glow min-h-[400px]">
       <div ref={canvasContainerRef} className="absolute inset-0 w-full h-full cursor-crosshair" />
       
-      <div className={`absolute inset-0 pointer-events-none flex flex-col items-center p-6 text-center z-10 ${isFinished ? 'justify-center bg-black/40' : 'justify-start pt-8'}`}>
+      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-6 text-center z-10">
         {isFinished ? (
+          // Экран результатов
           <div className="bg-[#0b0812]/95 backdrop-blur-2xl border border-imperial/50 p-10 rounded-3xl flex flex-col items-center gap-4 shadow-[0_0_50px_rgba(96,81,155,0.4)] animate-in zoom-in-95 duration-500 pointer-events-auto min-w-[320px]">
             {isNewPb && <div className="text-yellow-400 text-xs font-black tracking-widest uppercase flex items-center gap-2 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] animate-pulse"><Trophy size={14}/> NEW PERSONAL BEST!</div>}
             <h2 className="text-sm font-bold text-lavender tracking-[0.2em] uppercase">Strafe Test Complete</h2>
             <div className="text-7xl font-black text-ivory drop-shadow-[0_0_20px_rgba(169,133,255,0.8)]">{avgTime} <span className="text-2xl text-lavender/50">ms</span></div>
-            <button onClick={() => { state.resetResults(); setLastTime(null); setIsNewPb(false); changeStatus('idle'); }} className="mt-4 w-full py-4 bg-imperial/20 hover:bg-imperial/40 border border-imperial/50 rounded-xl text-sm font-bold text-ivory tracking-widest uppercase transition-all flex items-center justify-center gap-3 shadow-[0_0_15px_rgba(96,81,155,0.3)] cursor-pointer"><RotateCcw size={18} /> PLAY AGAIN</button>
+            <button onClick={() => { state.resetResults(); setLastTime(null); setIsNewPb(false); changeStatus('idle'); }} className="mt-4 w-full py-4 bg-imperial/20 hover:bg-imperial/40 border border-imperial/50 rounded-xl text-sm font-bold text-ivory tracking-widest uppercase transition-all flex items-center justify-center gap-3 shadow-[0_0_15px_rgba(96,81,155,0.3)] cursor-pointer pointer-events-auto"><RotateCcw size={18} /> PLAY AGAIN</button>
+          </div>
+        ) : errorMsg ? (
+          // ИСПРАВЛЕНИЕ: ошибка — отдельное состояние, не перекрывается кнопкой
+          <div className="flex flex-col items-center gap-4 pointer-events-auto">
+            <p className="text-sm font-bold text-red-400 bg-red-950/50 px-4 py-2 rounded-lg border border-red-500/30 flex items-center gap-2">
+              <AlertTriangle size={16} /> {errorMsg}
+            </p>
+            <button
+              onClick={handleStart}
+              className="px-8 py-4 bg-imperial/20 hover:bg-imperial/40 border border-imperial/50 rounded-full text-lg font-black text-ivory tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(96,81,155,0.4)]"
+            >
+              RETRY ATTEMPT
+            </button>
+          </div>
+        ) : uiStatus === 'idle' ? (
+          // Чистый старт
+          <div className="flex flex-col items-center gap-4 pointer-events-auto">
+            {lastTime !== null && (
+              <p className="text-2xl font-bold text-lavender/80 tracking-wider">React: {lastTime} ms</p>
+            )}
+            <button
+              onClick={handleStart}
+              className="px-8 py-4 bg-imperial/20 hover:bg-imperial/40 border border-imperial/50 rounded-full text-lg font-black text-ivory tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(96,81,155,0.4)]"
+            >
+              START STRAFE TEST
+            </button>
           </div>
         ) : (
-          <>
-            {uiStatus === 'idle' && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
-                <button onClick={handleStart} className="px-8 py-4 bg-imperial/20 hover:bg-imperial/40 border border-imperial/50 rounded-full text-lg font-black text-ivory tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(96,81,155,0.4)]">
-                  {errorMsg ? 'RETRY ATTEMPT' : 'START STRAFE TEST'}
-                </button>
-              </div>
-            )}
-            
-            {/* Текст зафиксирован и больше НЕ меняется при стрейфе шарика (без ложных подсказок) */}
+          // Активная игра — подсказки
+          <div className="absolute top-8 left-0 right-0 flex justify-center">
             {uiStatus === 'waiting' && (
-              <span className="text-xs font-black tracking-[0.3em] uppercase text-purple-400 animate-pulse bg-purple-950/40 px-4 py-2 border border-purple-500/20 rounded">HOVER OVER THE TARGET TO BEGIN TRACKING</span>
+              <span className="text-xs font-black tracking-[0.3em] uppercase text-purple-400 animate-pulse bg-purple-950/40 px-4 py-2 border border-purple-500/20 rounded">
+                HOVER OVER THE TARGET TO BEGIN TRACKING
+              </span>
             )}
             {(uiStatus === 'tracking' || uiStatus === 'reaction_phase') && (
-              <span className="text-xs font-black tracking-[0.3em] uppercase text-purple-400 bg-purple-950/40 px-4 py-2 border border-purple-500/20 rounded">KEEP TRACKING THE TARGET!</span>
+              <span className="text-xs font-black tracking-[0.3em] uppercase text-purple-400 bg-purple-950/40 px-4 py-2 border border-purple-500/20 rounded">
+                KEEP TRACKING THE TARGET!
+              </span>
             )}
-            
-            {uiStatus === 'idle' && lastTime !== null && !errorMsg && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-2xl font-bold text-lavender/80 tracking-wider">React: {lastTime} ms</p>
-              </div>
-            )}
-            {errorMsg && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-sm font-bold text-red-400 bg-red-950/50 px-4 py-2 rounded-lg border border-red-500/30 flex items-center gap-2"><AlertTriangle size={16} /> {errorMsg}</p>
-              </div>
-            )}
-          </>
+          </div>
         )}
       </div>
     </div>

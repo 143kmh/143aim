@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/app/[lang]/auth/useAuthStore';
-import { Crosshair, Zap, BarChart2, LogIn, LogOut, Loader2, User, Trophy, BookOpen } from 'lucide-react';
+import { Crosshair, Zap, BarChart2, LogIn, Loader2, User, Trophy, BookOpen } from 'lucide-react';
 
 export default function Header({ dict, lang }: { dict: any, lang: string }) {
   const pathname = usePathname();
@@ -55,7 +55,6 @@ export default function Header({ dict, lang }: { dict: any, lang: string }) {
   const toggleLang = lang === 'ru' ? 'en' : 'ru';
   const newPath = pathname.replace(`/${lang}`, `/${toggleLang}`);
 
-  // ВСЕ ВАШИ ВКЛАДКИ НАВИГАЦИИ ПО ТЗ
   const navLinks = [
     { href: `/${lang}/converter`, label: dict.header.converter, icon: <Crosshair size={14} /> },
     { href: `/${lang}/reaction`, label: dict.header.reaction, icon: <Zap size={14} /> },
@@ -69,11 +68,21 @@ export default function Header({ dict, lang }: { dict: any, lang: string }) {
       <header className="sticky top-0 z-[100] w-full border-b border-white/5 bg-[#05020a]/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
         <div className="max-w-[1920px] mx-auto px-6 h-16 flex items-center justify-between">
           
-          <Link href={`/${lang}`} className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-imperial to-imperial/20 rounded flex items-center justify-center border border-imperial/50 group-hover:shadow-[0_0_15px_rgba(96,81,155,0.6)] transition-all">
-              <span className="font-black text-ivory text-xs">143</span>
+          {/* ЛОГО: иконка сердца + шрифт Orbitron */}
+          <Link href={`/${lang}`} className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#7c3aed] to-[#4c1d95] rounded-lg flex items-center justify-center border border-purple-500/50 group-hover:shadow-[0_0_18px_rgba(124,58,237,0.7)] transition-all">
+              {/* Сердце SVG фиолетовое */}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
+              </svg>
             </div>
-            <span className="font-black tracking-widest text-ivory text-sm hidden sm:block">AIM CLUB</span>
+            {/* Современный шрифт через Google Fonts inline */}
+            <span 
+              className="font-black text-ivory text-sm hidden sm:block tracking-widest"
+              style={{ fontFamily: "'Orbitron', 'Rajdhani', 'Inter', sans-serif", letterSpacing: '0.15em' }}
+            >
+              143 AIM CLUB
+            </span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
