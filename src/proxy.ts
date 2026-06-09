@@ -4,11 +4,11 @@ import type { NextRequest } from "next/server";
 const locales = ['en', 'ru'];
 const defaultLocale = 'en';
 
-// Обратите внимание: функция теперь называется proxy!
+// Функция обрабатывает входящие запросы и настраивает локализацию (языковые префиксы)
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Проверяем, есть ли уже язык в ссылке
+  // Проверяем, есть ли уже язык (en или ru) в начале пути ссылки
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
@@ -17,14 +17,15 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
  
-  // Если языка нет, перекидываем на английский по умолчанию
+  // Если префикса языка нет, принудительно перенаправляем на английскую версию по умолчанию
   request.nextUrl.pathname = `/${defaultLocale}${pathname}`;
   return NextResponse.redirect(request.nextUrl);
 }
  
 export const config = {
   matcher: [
-    // Игнорируем системные пути Next.js и картинки
-    '/((?!_next/static|_next/image|favicon.ico|api).*)',
+    // Регулярное выражение (фильтр): перехватывать ВСЕ пути, КРОМЕ указанных в скобках после знака ?!
+    // Мы добавили "riot\\.txt" в этот список исключений
+    '/((?!_next/static|_next/image|favicon.ico|api|ranks|riot\\.txt).*)',
   ],
 };
